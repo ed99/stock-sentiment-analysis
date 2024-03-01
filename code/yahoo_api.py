@@ -12,24 +12,40 @@ class API():
     def get_news(self, ticker):
         date_format = "%b-%d-%y %H:%M %S"
 
-        querystring = {"symbol": f"{ticker}"}
+        # querystring = {"symbol": f"{ticker}"}
+        querystring = {"tickers":f"{ticker}"}
 
         response = requests.get(
             url=config.NEWS_API_URL, headers=config.headers, params=querystring)
 
         respose_json = response.json()
 
+        from dateutil import parser
+        from datetime import timezone
+
         data_array = []
 
-        if 'item' in respose_json:
-            articles = respose_json['item']
+        if 'body' in respose_json:
+            articles = respose_json['body']
             for article in articles:
-                # Mon, 05 Jun 2023 20:46:19 +0000
-                utc_datetime = datetime.strptime(
-                    article['pubDate'], '%a, %d %b %Y %H:%M:%S %z')
+                # Convert to datetime object
+                # input_datetime = datetime.fromisoformat(article['pubDate'])
+
+                # # Convert to UTC timezone
+                # utc_datetime = input_datetime.astimezone(datetime.timezone.utc)
+
+                # Convert to UTC datetime
+                utc_datetime = parser.parse(article['pubDate']).astimezone(timezone.utc)
+
+
+
+                # # Mon, 05 Jun 2023 20:46:19 +0000
+                # utc_datetime = datetime.strptime(
+                #     article['pubDate'], '%a, %d %b %Y %H:%M:%S %z')
 
                 title_i = article['title']
-                description_i = article['description']
+                # description_i = article['description']
+                description_i = ""
                 link_i = article['link']
                 # Set column names
                 data_array.append(
